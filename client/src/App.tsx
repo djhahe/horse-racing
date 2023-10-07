@@ -14,10 +14,12 @@ const horses: THorse[] = [
 export type THorse = { id: number; name: string };
 
 function App() {
+  // const { publicKey } = useAccount();
+  // const { signMessage, data } = useSignMessage();
   const [isRacing, setIsRacing] = useState(false);
   const [result, setResult] = useState<{ id: number; position: number }[]>([]);
-  const [selectedHorse, setSelectedHorse] = useState<number>(0);
-  const [selectedStake, setSelectedStake] = useState<number>(100);
+  const [selectedHorse] = useState<number>(0);
+  const [selectedStake] = useState<number>(100);
   const [status, setStatus] = useState<'win' | 'lose' | undefined>();
 
   useEffect(() => {
@@ -40,39 +42,11 @@ function App() {
     }
   };
 
-  const onSelectHorse = (e: any) => {
-    setSelectedHorse(e.target.value);
-  };
+  // console.log('data: ', data);
 
   return (
     <div className="flex flex-col items-center">
-      <div className="text-4xl font-bold">Ghost Racing</div>
-      <div className="flex flex-col justify-center items-center gap-4 mt-4">
-        <div>Choose your racer</div>
-        <div className="flex gap-4">
-          <div className="flex gap-2">
-            <div>Ghost:</div>
-            <select className="w-20" onChange={onSelectHorse} value={selectedHorse}>
-              {horses.map(({ id, name }) => {
-                return (
-                  <option key={id} value={id}>
-                    {name}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-          <div className="flex gap-2">
-            <div>Stake:</div>
-            <input
-              className="w-20"
-              value={selectedStake}
-              type="number"
-              onChange={(e) => setSelectedStake(parseInt(e.target.value))}
-            />
-          </div>
-        </div>
-      </div>
+      <div className="text-4xl font-bold">Horse Racing</div>
       <div className="px-4 cursor-pointer mt-2 rounded-lg bg-red-400" onClick={onStart}>
         {isRacing ? 'Racing...' : 'Start'}
       </div>

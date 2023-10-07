@@ -1,0 +1,8 @@
+packages:
+  - 'docs'
+  - 'client'
+  - 'game-portal'
+  - '!**/test/**'
+  - 'examples/*'
+
+link-workspace-packages: true
