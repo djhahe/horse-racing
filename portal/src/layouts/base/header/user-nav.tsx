@@ -11,10 +11,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useNavigate } from 'react-router-dom';
+import { PathsEnum } from '@/enums/paths';
 
 export function UserNav() {
+  const navigate = useNavigate();
   const { publicKey } = useAccount();
-  const { disconnect } = useDisconnect();
+  const { disconnect } = useDisconnect({
+    onSuccess: () => {
+      navigate(PathsEnum.HOME);
+    }
+  });
 
   return (
     <DropdownMenu>
