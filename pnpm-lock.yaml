@@ -127,7 +127,7 @@ importers:
         specifier: ^5.2.2
         version: 5.2.2
 
-  game-portal:
+  portal:
     dependencies:
       '@casperdash/usewallet':
         specifier: ^1.0.1
@@ -1790,6 +1790,8 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+      react:
+        optional: true
     dependencies:
       '@babel/runtime': 7.23.1
       '@types/react': 18.2.25
@@ -1833,6 +1835,8 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0
     peerDependenciesMeta:
       '@types/react':
+        optional: true
+      react:
         optional: true
     dependencies:
       '@babel/runtime': 7.23.1
