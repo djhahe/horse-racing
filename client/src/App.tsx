@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import { RacingCourt } from './components/RacingCourt';
 import { Modal, Button } from 'antd';
-import { useAccount, useSignMessage } from '@casperdash/usewallet';
+import { useAccount } from '@casperdash/usewallet';
 
 const raceTime = 5000;
 const horses: THorse[] = [

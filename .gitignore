@@ -2,7 +2,6 @@
 .next/
 .store/
 .turbo/
-data/
 dist/
 node_modules/
 target/

@@ -1,6 +1,8 @@
 packages:
   - 'docs'
   - 'client'
+  - 'contracts'
+  - 'contracts-client'
   - 'game-portal'
   - '!**/test/**'
   - 'examples/*'
