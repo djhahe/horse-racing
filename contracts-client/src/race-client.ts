@@ -55,8 +55,6 @@ export class RaceClient extends BaseClient {
     }
 
     public async registerRaceConfig(host: ContractInfo | string, args: RaceRegisterConfigArgs) {
-        const contractClient = await this.getContractClient(host);
-
         const runtimeArgs = this.createRuntimeArgs({
             name: CLValueBuilder.string(args.config.name),
             racers: CLValueBuilder.u32(args.config.racers),
@@ -64,7 +62,8 @@ export class RaceClient extends BaseClient {
             min_bet: CLValueBuilder.u512(args.config.min_bet),
             max_bet: CLValueBuilder.u512(args.config.max_bet)
         });
-
+        
+        const contractClient = await this.getContractClient(host);
         const deploy = contractClient.callEntrypoint("register_race_config", runtimeArgs, args.key.publicKey, this.config.chainName, String(args.paymentAmount), [args.key]);
         await this.deploy(`Register race config`, deploy);
     }
@@ -102,31 +101,50 @@ export class RaceClient extends BaseClient {
         await this.deploy(`Top up ${args.amount}`, deploy);
     }
 
-    public async getRacesCounter(host: ContractInfo | string): Promise<number> {
-        return this.getContractData_BigNumber(host, "races_counter");
+    public async getRacesConfigCounter(host: ContractInfo | string): Promise<number> {
+        return this.getContractData_BigNumber(host, "race_config_counter");
+    }
+
+    public async getRacesCounter(host: ContractInfo | string, raceConfigID: number): Promise<number> {
+        const contractClient = await this.getContractClient(host);
+        const data = await contractClient.queryContractDictionary("races_counter", String(raceConfigID));
+        Logger.debug(() => `Last id of ${raceConfigID} is ${JSON.stringify(data)}`);
+        return data.data;
     }
 
     public async getRaces(host: ContractInfo | string, owner: CLKeyParameters): Promise<Race[]> {
-        const counter = await this.getRacesCounter(host);
+        const counter = await this.getRacesConfigCounter(host);
         const races = [];
 
         for (let i = 1; i <= counter; i++) {
-            const race = await this.getRace(host, i);
-            if (!owner || bytesToHex(race.player.value() as Uint8Array) == bytesToHex(owner.value() as Uint8Array)) {
-                races.push(race);
+            let raceCounter = await this.getRacesCounter(host, i);
+            for (let j = 1; j <= raceCounter; j++) {
+                const race = await this.getRace(host, `${i}_${j}`);
+                if (!owner || bytesToHex(race.player.value() as Uint8Array) == bytesToHex(owner.value() as Uint8Array)) {
+                    races.push(race);
+                }
             }
         }
-
-        Logger.debug(() => `Found ${races.length} payments with ids = ${races.map(p => p.id)}`);
+        Logger.debug(() => `Found ${races.length} races`);
         return races;
     }
 
-    public async getRace(host: ContractInfo | string, id: number): Promise<Race> {
-        const itemData = await Utils.getDictionaryItemByName(this.getContractHashString(host), "races", String(id), true);
+    public async getLastRace(host: ContractInfo | string): Promise<Race> {
+        const counter = await this.getRacesConfigCounter(host);
+        const raceCounter = await this.getRacesCounter(host, counter);
+        const race = await this.getRace(host, `${counter}_${raceCounter}`);
+        return race;
+    }
+
+    /**
+     * id is: raceConfigID_raceID (e.g, 1_1, 1_2, 2_4)
+     */
+    public async getRace(host: ContractInfo | string, id: string): Promise<Race> {
+        const itemData = await Utils.getDictionaryItemByName(this.getContractHashString(host), "races", id, true);
         const bytes = JSON.parse(JSON.stringify(itemData.CLValue))["bytes"] as string;
         const data = new CLRaceBytesParser().fromBytesWithRemainder(hexToBytes(bytes));
         const payment = data.result.unwrap().data;
-        Logger.debug(() => `Payment ${id}: ${JSON.stringify(payment)}`);
+        Logger.debug(() => `Get race ${id}: ${JSON.stringify(payment)}`);
         return payment;
     }
 

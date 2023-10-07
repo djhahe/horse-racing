@@ -50,7 +50,7 @@ export class Workflow {
             let args = {
                 key: this.config.main,
                 paymentAmount: this.config.paymentCommon,
-                wasm: Utils.getBinary("../res/horse-racing-1.0.0.wasm"),
+                wasm: Utils.getBinary("../res/contracts/horse-racing-1.0.0.wasm"),
                 id: "casperdash_horse_racing",
                 name: "Horse Racing",
                 admins: [this.config.admin.accountHash()]
@@ -70,7 +70,7 @@ export class Workflow {
         const host = await this.getHost();
         const hostClient = this.getHostClient(); 
         await hostClient.quickPlay({
-            wasm: Utils.getBinary("../res/horse-racing-play-1.0.0.wasm"),
+            wasm: Utils.getBinary("../res/contracts/horse-racing-play-1.0.0.wasm"),
             key: user,
             paymentAmount: this.config.paymentCommon,
             host: host.toByteArray(),
@@ -87,7 +87,7 @@ export class Workflow {
         const hostClient = this.getHostClient(); 
 
         await hostClient.topUp({
-            wasm: Utils.getBinary("../res/horse-racing-topup-1.0.0.wasm"),
+            wasm: Utils.getBinary("../res/contracts/horse-racing-topup-1.0.0.wasm"),
             key: user,
             paymentAmount: this.config.paymentCommon,
             host: host.toByteArray(),
