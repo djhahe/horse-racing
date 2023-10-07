@@ -1,13 +1,8 @@
 import { CLKeyParameters, CLValueBuilder } from "casper-js-sdk";
-import { Utils, ContractInfo, DeployArgs, Logger, BaseClient } from "casper-contracts-client/src/core";
+import { Utils, ContractInfo, DeployArgs, Logger, BaseClient } from "casper-contracts-client";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { CLRaceConfigBytesParser, RaceConfig } from "./data/race-config";
 import { CLRaceBytesParser, Race } from "./data/race";
-
-export enum RegisterTokensIDMode {
-    Override = 1,
-    Append = 2
-}
 
 export interface RaceInstallArgs extends DeployArgs {
     wasm: Uint8Array,
