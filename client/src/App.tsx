@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import { RacingCourt } from './components/RacingCourt';
 import { Modal, Button } from 'antd';
+import { useAccount, useSignMessage } from '@casperdash/usewallet';
 
 const raceTime = 5000;
 const horses: THorse[] = [
@@ -14,8 +15,7 @@ const horses: THorse[] = [
 export type THorse = { id: number; name: string };
 
 function App() {
-  // const { publicKey } = useAccount();
-  // const { signMessage, data } = useSignMessage();
+  const { publicKey } = useAccount();
   const [isRacing, setIsRacing] = useState(false);
   const [result, setResult] = useState<{ id: number; position: number }[]>([]);
   const [selectedHorse] = useState<number>(0);
@@ -42,12 +42,11 @@ function App() {
     }
   };
 
-  // console.log('data: ', data);
+  console.log('data: ', publicKey);
 
   return (
     <div className="flex flex-col items-center">
-      <div className="text-4xl font-bold">Horse Racing</div>
-      <div className="px-4 cursor-pointer mt-2 rounded-lg bg-red-400" onClick={onStart}>
+      <div className="px-4 cursor-pointer rounded-lg bg-red-400" onClick={onStart}>
         {isRacing ? 'Racing...' : 'Start'}
       </div>
       <div className="flex justify-start pl-10 w-full mt-4">
@@ -68,7 +67,9 @@ function App() {
         open={status !== undefined}
         footer={
           <div>
-            <Button type="primary" className="bg-blue-400" onClick={() => setStatus(undefined)}>
+            <Button type="primary" className="bg-blue-400" onClick={() => {
+              setStatus(undefined);
+            }}>
               Ok
             </Button>
           </div>
