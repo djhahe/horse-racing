@@ -3,7 +3,7 @@ packages:
   - 'client'
   - 'contracts'
   - 'contracts-client'
-  - 'game-portal'
+  - 'portal'
   - '!**/test/**'
   - 'examples/*'
 
