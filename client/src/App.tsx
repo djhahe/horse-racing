@@ -2,9 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import { RacingCourt } from './components/RacingCourt';
 import { Modal, Button } from 'antd';
-import { useAccount } from '@casperdash/usewallet';
+import { useAccount, useSign } from '@casperdash/usewallet';
+import { buildPlayDeploy, sendDeploy } from './lib/deploy';
 
-const raceTime = 5000;
+const raceTime = 20000;
 const horses: THorse[] = [
   { id: 0, name: 'Ghost 1' },
   { id: 1, name: 'Ghost 2' },
@@ -13,14 +14,29 @@ const horses: THorse[] = [
 ];
 
 export type THorse = { id: number; name: string };
+const deployResultMock = [
+  { id: 0, position: 4 },
+  { id: 1, position: 2 },
+  { id: 2, position: 1 },
+  { id: 3, position: 3 },
+];
 
 function App() {
   const { publicKey } = useAccount();
+
   const [isRacing, setIsRacing] = useState(false);
   const [result, setResult] = useState<{ id: number; position: number }[]>([]);
+  const [deployResult, setDeployResult] = useState<{ id: number; position: number }[]>([]);
   const [selectedHorse] = useState<number>(0);
   const [selectedStake] = useState<number>(100);
   const [status, setStatus] = useState<'win' | 'lose' | undefined>();
+  const { signAsync } = useSign();
+
+  useEffect(() => {
+    setTimeout(() => {
+      setDeployResult(deployResultMock);
+    }, 10000);
+  }, []);
 
   useEffect(() => {
     if (result.length === horses.length) {
@@ -35,8 +51,12 @@ function App() {
     });
   }, []);
 
-  const onStart = () => {
+  const onStart = async () => {
     if (!isRacing) {
+      const deploy = buildPlayDeploy(selectedHorse, selectedStake, publicKey!);
+      const signedDeploy = await signAsync({ deploy, targetPublicKeyHex: publicKey!, signingPublicKeyHex: publicKey! });
+      const hash = await sendDeploy(signedDeploy);
+
       setResult([]);
       setIsRacing(true);
     }
@@ -62,14 +82,24 @@ function App() {
           })}
         </div>
       </div>
-      <RacingCourt isRacing={isRacing} raceTime={raceTime} horses={horses} onFinished={onFinished} />
+      <RacingCourt
+        isRacing={isRacing}
+        raceTime={raceTime}
+        horses={horses}
+        onFinished={onFinished}
+        deployResult={deployResult}
+      />
       <Modal
         open={status !== undefined}
         footer={
           <div>
-            <Button type="primary" className="bg-blue-400" onClick={() => {
-              setStatus(undefined);
-            }}>
+            <Button
+              type="primary"
+              className="bg-blue-400"
+              onClick={() => {
+                setStatus(undefined);
+              }}
+            >
               Ok
             </Button>
           </div>

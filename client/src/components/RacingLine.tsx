@@ -5,11 +5,17 @@ export const RacingLine = ({
   isRacing,
   onFinished,
   horseId,
+  result,
+  currentPosition,
+  onMove,
 }: {
   horseId: number;
   isRacing: boolean;
   raceTime: number;
   onFinished: (horseId: number) => void;
+  result?: number;
+  currentPosition: number;
+  onMove: (id: number, distance: number) => void;
 }) => {
   const [horsePosition, setHorsePosition] = useState(0);
   const interval = useRef<NodeJS.Timeout>();
@@ -28,17 +34,20 @@ export const RacingLine = ({
       interval.current = setInterval(() => {
         // random speed
         // after racetime the horse position will be the same
-
-        const speed = Math.random() * 10;
-
-        setHorsePosition((prev) => {
-          const nextPos = prev + speed;
-          if (nextPos > 100) {
-            return 100;
-          } else {
-            return nextPos;
-          }
-        });
+        let speed: number = Math.random() / 4;
+        if (result && currentPosition > result) {
+          speed = speed * 10;
+        } else
+          setHorsePosition((prev) => {
+            const nextPos = prev + speed;
+            if (nextPos > 100) {
+              onMove(horseId, 100);
+              return 100;
+            } else {
+              onMove(horseId, nextPos);
+              return nextPos;
+            }
+          });
       }, 100);
     } else {
       setHorsePosition(4);
